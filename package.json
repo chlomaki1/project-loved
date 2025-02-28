@@ -1,0 +1,17 @@
+{
+  "name": "project-loved",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "website:dev": "npx next dev ./apps/website",
+    "website:install": "yarn install --cwd ./apps/website"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

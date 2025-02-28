@@ -1,0 +1,12 @@
+[package]
+name = "server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+athena = { path = "../../packages/athena" }
+sea-orm = { version = "1", features = [ 
+    "sqlx-postgres",
+    "runtime-tokio-rustls",
+    "macros"
+] }
