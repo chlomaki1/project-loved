@@ -13,9 +13,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-RUN --mount=type=cache \
-    cargo install sea-orm-cli
-
 RUN cargo build --release
 
 # runtime image
