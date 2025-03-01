@@ -1,28 +1,15 @@
-FROM rustlang/rust:nightly-bookworm AS builder
+FROM rustlang/rust:nightly-alpine3.21 AS builder
 
+COPY --link . /app
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
+RUN apk update && apk upgrade \
+    && apk add --no-cache \
+    alpine-sdk \
     libpq-dev \
-    libssl-dev \
-    pkg-config \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN cargo install sea-orm-cli
-
-COPY . .
+    pkgconfig \
+    && apk cache clean
 
 RUN cargo build --release
- 
-FROM debian:bookworm-slim
 
-RUN apt-get update && apt-get install -y \
-    libpq5 \
-    ca-certificates \
-    postgresql-client \
-    libssl3 \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY --from=builder /usr/local/cargo/bin/sea-orm-cli /usr/local/bin/
-CMD ["sh", "-c", "cd /app && sea-orm-cli migrate up -u $DATABASE_URL -d migration && target/release/project-loved"]
+ENTRYPOINT ["/app/target/release/server"]
