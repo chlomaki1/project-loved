@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "website:dev": "npx next dev ./apps/website",
-    "website:install": "yarn install --cwd ./apps/website"
+    "website:install": "yarn install --cwd ./apps/website",
+    "athena:generate": "sea-orm-cli generate entity --expanded-format -o packages/athena/src/entities"
   },
   "keywords": [],
   "author": "",

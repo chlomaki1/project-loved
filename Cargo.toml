@@ -5,4 +5,4 @@ members = [
     
     "apps/server",
     "packages/athena"
-]
+, "packages/athena_macros"]
