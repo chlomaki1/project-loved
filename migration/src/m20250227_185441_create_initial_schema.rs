@@ -13,10 +13,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(pk_auto(Users::Id))
                     .col(string(Users::Username))
-                    .col(
-                        ColumnDef::new(Users::Country)
-                            .char_len(2)
-                    )
+                    .col(string(Users::Country))
                     .col(boolean(Users::Banned))
                     .col(timestamp(Users::ApiFetchedAt))
                     .col(json(Users::Tokens).default("{}"))
