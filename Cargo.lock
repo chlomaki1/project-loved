@@ -506,9 +506,11 @@ name = "athena"
 version = "0.1.0"
 dependencies = [
  "athena_macros",
+ "bitflags",
  "dotenvy",
  "sea-orm",
  "serde",
+ "thiserror 2.0.12",
 ]
 
 [[package]]
