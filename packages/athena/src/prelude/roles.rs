@@ -8,3 +8,7 @@ generate_display! {
         id = i32: base.id
     }
 }
+
+enum Permissions {
+    
+}

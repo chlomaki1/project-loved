@@ -13,8 +13,8 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(pk_auto(Users::Id))
                     .col(string(Users::Username))
-                    .col(string(Users::Country))
-                    .col(boolean(Users::Banned))
+                    .col(ColumnDef::new(Users::Country).char_len(2))
+                    .col(boolean(Users::Restricted))
                     .col(timestamp(Users::ApiFetchedAt))
                     .col(json(Users::Tokens).default("{}"))
                     .to_owned()
@@ -195,7 +195,7 @@ enum Users {
     Id,
     Username,
     Country,
-    Banned,
+    Restricted,
     ApiFetchedAt,
     Tokens,
 }

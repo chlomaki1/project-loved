@@ -16,7 +16,7 @@ pub struct Model {
     pub id: i32,
     pub username: String,
     pub country: Option<String>,
-    pub banned: bool,
+    pub restricted: bool,
     pub api_fetched_at: DateTime,
     pub tokens: Json,
 }
@@ -26,7 +26,7 @@ pub enum Column {
     Id,
     Username,
     Country,
-    Banned,
+    Restricted,
     ApiFetchedAt,
     Tokens,
 }
@@ -58,7 +58,7 @@ impl ColumnTrait for Column {
             Self::Id => ColumnType::Integer.def(),
             Self::Username => ColumnType::String(StringLen::None).def(),
             Self::Country => ColumnType::Char(Some(2u32)).def().null(),
-            Self::Banned => ColumnType::Boolean.def(),
+            Self::Restricted => ColumnType::Boolean.def(),
             Self::ApiFetchedAt => ColumnType::DateTime.def(),
             Self::Tokens => ColumnType::Json.def(),
         }

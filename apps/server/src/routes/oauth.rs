@@ -1,5 +1,5 @@
 use actix_web::{get, web, Responder};
-use athena::{entities::users, osu::users::DisplayUser};
+use athena::{entities::users, prelude::users::DisplayUser};
 use redis::Commands;
 use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel};
 use serde::{Deserialize, Serialize};
@@ -81,7 +81,6 @@ pub async fn login_token_callback(
     let token_state = serde_json::from_str(query.state.clone().as_str());
 
     if let Err(err) = token_state {
-        println!("{:?}", query.state.clone());
         return Err(LovedError::InvalidTokenState);
     }
 
@@ -104,12 +103,10 @@ pub async fn login_token_callback(
         }).await;
 
         if existing_state.is_err() {
-            println!("{:?}", existing_state);
             return Err(LovedError::InvalidTokenState);
         }
 
         if let Ok(false) = existing_state {
-            println!("mreow");
             Err(LovedError::InvalidTokenState)
         } else {
             let user_client = state.get_osu_client(query.code.clone(), "/login").await?;
@@ -122,7 +119,7 @@ pub async fn login_token_callback(
                 
                 if existing.username.as_ref() != &user.username.to_string() {
                     // TODO: Store previous usernames
-                    existing.set(users::Column::Username, user.username.into_string().into());
+                    existing.set(users::Column::Username, user.username.to_string().into());
                 }
             
                 if existing.is_changed() {
@@ -131,9 +128,9 @@ pub async fn login_token_callback(
             } else {
                 let new_user = users::ActiveModel {
                     id: sea_orm::ActiveValue::Set(user.user_id.try_into().unwrap()),
-                    username: sea_orm::ActiveValue::Set(user.username.into_string()),
-                    country: sea_orm::ActiveValue::Set(Some(user.country)),
-                    banned: sea_orm::ActiveValue::Set(user.is_deleted),
+                    username: sea_orm::ActiveValue::Set(user.username.to_string()),
+                    country: sea_orm::ActiveValue::Set(Some(user.country_code.to_string())),
+                    restricted: sea_orm::ActiveValue::Set(user.is_restricted.unwrap_or_else(|| false)),
                     api_fetched_at: sea_orm::ActiveValue::Set(chrono::Utc::now().naive_utc()),
                     tokens: sea_orm::ActiveValue::Set(serde_json::json!({})) // TODO: Securely store tokens
                 };

@@ -145,7 +145,7 @@ impl From<JsonPayloadError> for LovedError {
 
 impl From<OsuError> for LovedError {
     fn from(error: OsuError) -> Self {
-        println!("{:?}", error);
+        println!("osu error: {:?}", error);
         match error {
             OsuError::UpdateToken { source: _} => LovedError::InvalidTokenState,
             _ => LovedError::BadRequest
@@ -155,7 +155,7 @@ impl From<OsuError> for LovedError {
 
 impl From<DbErr> for LovedError {
     fn from(error: DbErr) -> Self {
-        println!("{:?}", error);
+        println!("db error: {:?}", error);
         match error {
             _ => LovedError::DatabaseError
         }
