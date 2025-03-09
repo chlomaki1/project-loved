@@ -1,7 +1,7 @@
 use athena_macros::generate_display;
 use sea_orm::{ColumnTrait, DbErr, EntityTrait, ActiveModelTrait, QueryFilter,};
 use crate::{entities::{role_assignments, roles, users}, errors::AthenaError};
-use super::roles::DisplayRole;
+use super::roles::{DisplayRole, FullRole};
 
 generate_display! {
     #[display(users::Model)]
@@ -13,7 +13,7 @@ generate_display! {
 impl DisplayUser {
     pub async fn obtain_roles(&mut self, conn: &sea_orm::DatabaseConnection) -> Result<(), DbErr> {
         if let Ok(roles) = get_user_roles(self.base.id, conn).await {
-            self.roles = roles.into_iter().map(|r| DisplayRole::new(r)).collect();
+            self.roles = roles.into_iter().map(|r| r.into_display()).collect();
         }
 
         Ok(())
@@ -22,7 +22,7 @@ impl DisplayUser {
 
 pub struct FullUser {
     pub base: users::Model,
-    pub roles: Vec<roles::Model>
+    pub roles: Vec<FullRole>
 }
 
 impl FullUser {
@@ -56,12 +56,19 @@ impl FullUser {
         })
     }
 
+    pub fn from(model: users::Model) -> Self {
+        FullUser {
+            base: model.clone(),
+            roles: Vec::new()
+        }
+    }
+
     pub fn into_display(self) -> DisplayUser {
-        DisplayUser { base: self.base, roles: self.roles.into_iter().map(|r| DisplayRole::new(r)).collect() }
+        DisplayUser { base: self.base, roles: self.roles.into_iter().map(|r| r.into_display()).collect() }
     }
 }
 
-async fn get_user_roles(user_id: i32, conn: &sea_orm::DatabaseConnection) -> Result<Vec<roles::Model>, DbErr> {
+async fn get_user_roles(user_id: i32, conn: &sea_orm::DatabaseConnection) -> Result<Vec<FullRole>, DbErr> {
     let role_tuple = role_assignments::Entity::find()
         .filter(role_assignments::Column::UserId.eq(user_id))
         .find_also_related(roles::Entity)
@@ -71,6 +78,6 @@ async fn get_user_roles(user_id: i32, conn: &sea_orm::DatabaseConnection) -> Res
     if role_tuple.is_empty() {
         Ok(Vec::new())
     } else {
-        Ok(role_tuple.into_iter().map(|(_, role)| role.unwrap()).collect())
+        Ok(role_tuple.into_iter().map(|(_, role)| FullRole::from(role.unwrap())).collect())
     }
 }
