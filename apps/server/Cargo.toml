@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+tokio = { version = "1.44.0", features = ["net", "full"] }
 athena = { path = "../../packages/athena" }
 dotenvy = "0.15.0"
 actix-web = "4"
