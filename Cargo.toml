@@ -4,5 +4,8 @@ members = [
     "migration",
     
     "apps/server",
-    "packages/athena"
-, "packages/athena_macros"]
+    "apps/queue_processor",
+
+    "packages/athena",
+    "packages/athena_macros"
+]
