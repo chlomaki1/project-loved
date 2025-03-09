@@ -1,5 +1,5 @@
 use actix_web::{get, web, Responder};
-use athena::{entities::users, prelude::users::DisplayUser};
+use athena::{entities::users, prelude::users::{DisplayUser, FullUser}};
 use redis::Commands;
 use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel};
 use serde::{Deserialize, Serialize};
@@ -114,8 +114,8 @@ pub async fn login_token_callback(
             let mut display_user = None;
 
             // TODO: Move this to a seperate function that does this
-            if let Some(existing) = users::Entity::find_by_id(TryInto::<i32>::try_into(user.user_id).unwrap()).one(&state.db_pool).await? {
-                let mut existing = existing.into_active_model();
+            if let Ok(existing) = FullUser::fetch(user.user_id.try_into().unwrap_or(0), &state.db_pool).await {
+                let mut existing = existing.base.into_active_model();
                 
                 if existing.username.as_ref() != &user.username.to_string() {
                     // TODO: Store previous usernames
@@ -123,19 +123,17 @@ pub async fn login_token_callback(
                 }
             
                 if existing.is_changed() {
-                    display_user = Some(DisplayUser::new(existing.update(&state.db_pool).await?));
+                    display_user = Some(FullUser::update(existing, &state.db_pool).await?.into_display());
                 }
             } else {
-                let new_user = users::ActiveModel {
+                display_user = Some(FullUser::create(users::ActiveModel {
                     id: sea_orm::ActiveValue::Set(user.user_id.try_into().unwrap()),
                     username: sea_orm::ActiveValue::Set(user.username.to_string()),
                     country: sea_orm::ActiveValue::Set(Some(user.country_code.to_string())),
                     restricted: sea_orm::ActiveValue::Set(user.is_restricted.unwrap_or_else(|| false)),
                     api_fetched_at: sea_orm::ActiveValue::Set(chrono::Utc::now().naive_utc()),
                     tokens: sea_orm::ActiveValue::Set(serde_json::json!({})) // TODO: Securely store tokens
-                };
-
-                display_user = Some(DisplayUser::new(new_user.insert(&state.db_pool).await?));
+                }, &state.db_pool).await?.into_display());
             }
 
             if let Some(mut display_user) = display_user {

@@ -26,25 +26,37 @@ pub struct FullUser {
 }
 
 impl FullUser {
-    async fn fetch(user_id: i32, conn: &sea_orm::DatabaseConnection) -> Result<Self, AthenaError> {
-        let base = users::Entity::find_by_id(user_id)
-            .one(conn)
-            .await?;
-
-        if let Some(base) = base {
-            Ok(FullUser { base, roles: get_user_roles(user_id, conn).await.unwrap_or(Vec::new())})
-        } else {
-            Err(AthenaError::ModelNotFound("User".to_string()))
-        }
-    }
-
-    async fn create(user: users::ActiveModel, conn: &sea_orm::DatabaseConnection) -> Result<Self, DbErr> {
+    pub async fn create(user: users::ActiveModel, conn: &sea_orm::DatabaseConnection) -> Result<Self, DbErr> {
         let base = user.insert(conn).await?;
 
         Ok(FullUser { base, roles: Vec::new() })
     }
 
-    fn into_display(self) -> DisplayUser {
+    pub async fn fetch(user_id: i32, conn: &sea_orm::DatabaseConnection) -> Result<Self, AthenaError> {
+        let base = users::Entity::find_by_id(user_id)
+            .one(conn)
+            .await?;
+
+        if let Some(base) = base {
+            Ok(FullUser {
+                base: base.clone(),
+                roles: get_user_roles(base.id, conn).await.unwrap_or(Vec::new())
+            })
+        } else {
+            Err(AthenaError::ModelNotFound("User".to_string()))
+        }
+    }
+
+    pub async fn update(model: users::ActiveModel, conn: &sea_orm::DatabaseConnection) -> Result<Self, DbErr> {
+        let base = model.update(conn).await?;
+
+        Ok(FullUser {
+            base: base.clone(),
+            roles: get_user_roles(base.id, conn).await.unwrap_or(Vec::new())
+        })
+    }
+
+    pub fn into_display(self) -> DisplayUser {
         DisplayUser { base: self.base, roles: self.roles.into_iter().map(|r| DisplayRole::new(r)).collect() }
     }
 }
