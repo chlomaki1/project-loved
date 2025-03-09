@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, net, io, net::SocketAddr};
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenvy::dotenv;
 use errors::LovedError;
@@ -8,6 +8,26 @@ pub mod routes;
 pub mod service;
 pub mod state;
 pub mod errors;
+
+#[cfg(unix)]
+fn bind_address() -> io::Result<SocketAddr> {
+    let listener = tokio::net::UnixListener::bind("/tmp/loved_server.sock")?;
+
+    Ok(listener.local_addr()?)
+}
+
+#[cfg(not(unix))]
+fn bind_address() -> io::Result<SocketAddr> {
+    use std::net::{IpAddr, Ipv4Addr};
+
+    Ok(SocketAddr::new(
+        IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)),
+        env::var("SERVER_PORT")
+            .expect("A port must be provided to run this application")
+            .parse::<u16>()
+            .unwrap(),
+    ))
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -23,7 +43,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-        .wrap(Logger::new("%a %{User-Agent}i"))
+            .wrap(Logger::new("%a %{User-Agent}i"))
             .app_data(web::JsonConfig::default()
                 .error_handler(|err, _| LovedError::from(err).into())
             )
@@ -39,13 +59,8 @@ async fn main() -> std::io::Result<()> {
             // /*
             .default_service(web::route().to(routes::handle_default))
     })
-    .workers(workers)    .bind((
-        "127.0.0.1",
-        env::var("SERVER_PORT")
-            .expect("A port must be provided to run this application")
-            .parse::<u16>()
-            .unwrap(),
-    ))?
+    .workers(workers)
+    .bind(bind_address()?)?
     .run()
     .await
 }

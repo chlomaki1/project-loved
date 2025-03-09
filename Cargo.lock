@@ -2447,7 +2447,7 @@ dependencies = [
 [[package]]
 name = "rosu-v2"
 version = "0.10.0"
-source = "git+https://github.com/MaxOhn/rosu-v2?branch=lazer#9e546c0b5bf65923fd66e2b624676d5f0924f404"
+source = "git+https://github.com/chlomaki1/rosu-v2?branch=lazer#cc8455b2c6c9065388a5a33810410b38c7b0b7cb"
 dependencies = [
  "bytes",
  "dashmap",

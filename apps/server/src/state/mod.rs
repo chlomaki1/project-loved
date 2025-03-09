@@ -53,6 +53,7 @@ impl LovedState {
 
     pub async fn get_osu_client(&self, user_token: String, oauth_type: &str) -> Result<Osu, OsuError> {
         Osu::builder()
+            .url(self.env.get::<String>("OSU_URL").unwrap())
             .client_id(self.env.get::<u64>("OSU_CLIENT_ID").unwrap())
             .client_secret(self.env.get::<String>("OSU_CLIENT_SECRET").unwrap())
             .with_authorization(user_token, self.env.get::<String>("OSU_REDIRECT_URI").unwrap() + oauth_type, Scopes::default())

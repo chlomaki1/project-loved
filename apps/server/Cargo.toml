@@ -16,6 +16,6 @@ sea-orm = { version = "1", features = [
     "macros"
 ] }
 redis = "0.29.1"
-rosu-v2 = { git = "https://github.com/MaxOhn/rosu-v2", branch = "lazer" }
+rosu-v2 = { git = "https://github.com/chlomaki1/rosu-v2", branch = "lazer" }
 uuid = { version = "1.15.1", features = [ "v4" ] }
 chrono = "0.4.40"
