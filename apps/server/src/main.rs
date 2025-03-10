@@ -41,7 +41,7 @@ async fn main() -> std::io::Result<()> {
 
     #[cfg(unix)]
     {
-        let _ = fs::remove_file(SOCKET_PATH); // Remove old socket if exists
+        let _ = std::fs::remove_file(SOCKET_PATH); // Remove old socket if exists
         server.bind_uds(SOCKET_PATH)?.run().await
     }
 
