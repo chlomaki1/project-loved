@@ -1,4 +1,5 @@
 use redis::AsyncCommands;
+use tokio_cron_scheduler::{Job, JobScheduler};
 use std::{collections::HashMap, sync::Arc, error::Error};
 use tokio;
 use async_trait::async_trait;
@@ -64,7 +65,7 @@ impl HandlerRegistry {
 
                 loop {
                     // Use BRPOP with a timeout (e.g., 5 seconds).
-                    let result: Option<(String, String)> = match con.brpop(queue.as_str(), 5).await {
+                    let result: Option<(String, String)> = match con.brpop(queue.as_str(), 5f64).await {
                         Ok(res) => res,
                         Err(e) => {
                             eprintln!("Error on BRPOP for queue {}: {}", queue, e);
@@ -94,7 +95,7 @@ pub struct TaskManager {
 
 impl TaskManager {
     /// Creates a new TaskManager.
-    pub fn new(redis_url: String) -> Self {
+    pub fn new() -> Self {
         Self {
             scheduled_tasks: Vec::new(),
         }
@@ -127,5 +128,6 @@ impl TaskManager {
         }
 
         scheduler.start().await?;
+        Ok(())
     }
 }

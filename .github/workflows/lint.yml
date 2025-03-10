@@ -22,7 +22,7 @@ jobs:
       - name: Install Clippy
         run: rustup component add clippy
       - name: Check
-        run: cargo check
+        run: cargo check --all
       - name: Clippy
         run: cargo clippy -- -D clippy::all
 
