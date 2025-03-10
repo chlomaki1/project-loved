@@ -1,7 +1,7 @@
 use actix_web::{get, web, Responder};
-use athena::{entities::users, prelude::users::{DisplayUser, FullUser}};
+use athena::{entities::users, prelude::users::FullUser};
 use redis::Commands;
-use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel};
+use sea_orm::{ActiveModelTrait, IntoActiveModel};
 use serde::{Deserialize, Serialize};
 
 use crate::{errors::LovedError, service::{self, Response}, state::LovedState};
@@ -80,7 +80,7 @@ pub async fn login_token_callback(
 ) -> impl Responder {
     let token_state = serde_json::from_str(query.state.clone().as_str());
 
-    if let Err(err) = token_state {
+    if let Err(_) = token_state {
         return Err(LovedError::InvalidTokenState);
     }
 

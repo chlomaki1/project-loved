@@ -128,42 +128,10 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
-        // Submissions table
-        manager
-            .create_table(
-                Table::create()
-                    .table(Submissions::Table)
-                    .if_not_exists()
-                    .col(pk_auto(Submissions::Id))
-                    .col(integer(Submissions::SubmitterId))
-                    .col(integer(Submissions::BeatmapsetId))
-                    .col(timestamp(Submissions::SubmittedAt))
-                    .col(tiny_integer(Submissions::GameMode))
-                    .col(string(Submissions::Reason))
-                    .foreign_key(
-                        ForeignKey::create()
-                            .name("fk_submissions_submitter")
-                            .from(Submissions::Table, Submissions::SubmitterId)
-                            .to(Users::Table, Users::Id)
-                    )
-                    .foreign_key(
-                        ForeignKey::create()
-                            .name("fk_submissions_beatmapset")
-                            .from(Submissions::Table, Submissions::BeatmapsetId)
-                            .to(Beatmapsets::Table, Beatmapsets::Id)
-                    )
-                    .to_owned()
-            )
-            .await?;
-
         Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Drop tables in reverse order of creation
-        manager
-            .drop_table(Table::drop().table(Submissions::Table).to_owned())
-            .await?;
 
         manager
             .drop_table(Table::drop().table(Beatmaps::Table).to_owned())
@@ -251,15 +219,4 @@ enum Beatmaps {
     StarRating,
     TotalLength,
     Version,
-}
-
-#[derive(DeriveIden)]
-enum Submissions {
-    Table,
-    Id,
-    SubmitterId,
-    BeatmapsetId,
-    SubmittedAt,
-    GameMode,
-    Reason,
 }
