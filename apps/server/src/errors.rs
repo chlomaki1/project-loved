@@ -1,4 +1,4 @@
-use actix_web::{error::JsonPayloadError, http::StatusCode, HttpResponse, ResponseError};
+use actix_web::{error::JsonPayloadError, http::StatusCode};
 use athena::RequestError;
 use rosu_v2::error::OsuError;
 use sea_orm::DbErr;

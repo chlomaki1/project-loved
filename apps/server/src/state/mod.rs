@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
 
 use athena::environment::LovedEnvironment;
 use rosu_v2::error::OsuError;
@@ -15,7 +13,8 @@ pub struct LovedState {
     pub env: LovedEnvironment,
     pub settings: LovedSettingsManager,
     pub db_pool: DatabaseConnection,
-    pub redis_pool: redis::Client
+    pub redis_pool: redis::Client,
+    pub osu_client: Osu
 }
 
 impl LovedState {
@@ -33,7 +32,10 @@ impl LovedState {
             db_pool: Database::connect(options)
                 .await
                 .expect("Failed to connect to database"),
-            redis_pool: redis::Client::open(&*env.redis_url.clone()).unwrap()
+            redis_pool: redis::Client::open(&*env.redis_url.clone()).unwrap(),
+            osu_client: Osu::new(env.get::<u64>("OSU_CLIENT_ID").unwrap(), env.get::<String>("OSU_CLIENT_SECRET").unwrap())
+                .await
+                .expect("Failed to create osu! API client")
         }
     }
 
