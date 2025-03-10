@@ -7,26 +7,28 @@ pub struct Entity;
 
 impl EntityName for Entity {
     fn table_name(&self) -> &str {
-        "submissions"
+        "submission_reviews"
     }
 }
 
 #[derive(Clone, Debug, PartialEq, DeriveModel, DeriveActiveModel, Eq)]
 pub struct Model {
     pub id: i32,
-    pub beatmapset_id: i32,
-    pub submitter_id: i32,
+    pub submission_id: i32,
+    pub reviewer_id: i32,
+    pub parent_id: Option<i32>,
     pub game_mode: i16,
-    pub submitted_at: DateTime,
+    pub content: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
 pub enum Column {
     Id,
-    BeatmapsetId,
-    SubmitterId,
+    SubmissionId,
+    ReviewerId,
+    ParentId,
     GameMode,
-    SubmittedAt,
+    Content,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DerivePrimaryKey)]
@@ -43,8 +45,8 @@ impl PrimaryKeyTrait for PrimaryKey {
 
 #[derive(Copy, Clone, Debug, EnumIter)]
 pub enum Relation {
-    Beatmapsets,
-    SubmissionReviews,
+    Submissions,
+    Users,
 }
 
 impl ColumnTrait for Column {
@@ -52,10 +54,11 @@ impl ColumnTrait for Column {
     fn def(&self) -> ColumnDef {
         match self {
             Self::Id => ColumnType::Integer.def(),
-            Self::BeatmapsetId => ColumnType::Integer.def(),
-            Self::SubmitterId => ColumnType::Integer.def(),
-            Self::GameMode => ColumnType::SmallInteger.def(),
-            Self::SubmittedAt => ColumnType::DateTime.def(),
+            Self::SubmissionId => ColumnType::Integer.def(),
+            Self::ReviewerId => ColumnType::Integer.def(),
+            Self::ParentId => ColumnType::Integer.def().null(),
+            Self::GameMode => ColumnType::SmallInteger.def().unique(),
+            Self::Content => ColumnType::Text.def(),
         }
     }
 }
@@ -63,24 +66,27 @@ impl ColumnTrait for Column {
 impl RelationTrait for Relation {
     fn def(&self) -> RelationDef {
         match self {
-            Self::Beatmapsets => Entity::belongs_to(super::beatmapsets::Entity)
-                .from(Column::BeatmapsetId)
-                .to(super::beatmapsets::Column::Id)
+            Self::Submissions => Entity::belongs_to(super::submissions::Entity)
+                .from(Column::SubmissionId)
+                .to(super::submissions::Column::Id)
                 .into(),
-            Self::SubmissionReviews => Entity::has_many(super::submission_reviews::Entity).into(),
+            Self::Users => Entity::belongs_to(super::users::Entity)
+                .from(Column::ReviewerId)
+                .to(super::users::Column::Id)
+                .into(),
         }
     }
 }
 
-impl Related<super::beatmapsets::Entity> for Entity {
+impl Related<super::submissions::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Beatmapsets.def()
+        Relation::Submissions.def()
     }
 }
 
-impl Related<super::submission_reviews::Entity> for Entity {
+impl Related<super::users::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::SubmissionReviews.def()
+        Relation::Users.def()
     }
 }
 

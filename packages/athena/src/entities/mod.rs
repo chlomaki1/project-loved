@@ -6,5 +6,6 @@ pub mod beatmaps;
 pub mod beatmapsets;
 pub mod role_assignments;
 pub mod roles;
+pub mod submission_reviews;
 pub mod submissions;
 pub mod users;

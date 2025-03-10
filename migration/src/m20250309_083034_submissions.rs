@@ -49,6 +49,62 @@ impl MigrationTrait for Migration {
                             .from(SubmissionReviews::Table, SubmissionReviews::ReviewerId)
                             .to(Users::Table, Users::Id)
                     )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_submission_reviews_parent")
+                            .from(SubmissionReviews::Table, SubmissionReviews::ParentId)
+                            .to(SubmissionReviews::Table, SubmissionReviews::Id)
+                    )
+                    .to_owned()
+            )
+            .await?;
+
+        manager
+            .create_table(
+                Table::create()
+                    .table(SubmissionRatings::Table)
+                    .if_not_exists()
+                    .col(pk_auto(SubmissionRatings::Id))
+                    .col(integer(SubmissionRatings::SubmissionId))
+                    .col(integer(SubmissionRatings::ReviewerId))
+                    .col(small_integer(SubmissionRatings::Value))
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_submission_ratings_submission")
+                            .from(SubmissionRatings::Table, SubmissionRatings::SubmissionId)
+                            .to(Submissions::Table, Submissions::Id)
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_submission_ratings_reviewer")
+                            .from(SubmissionRatings::Table, SubmissionRatings::ReviewerId)
+                            .to(Users::Table, Users::Id)
+                    )
+                    .to_owned()
+            )
+            .await?;
+
+        manager
+            .create_table(
+                Table::create()
+                    .table(SubmissionReviewRatings::Table)
+                    .if_not_exists()
+                    .col(pk_auto(SubmissionReviewRatings::Id))
+                    .col(integer(SubmissionReviewRatings::ReviewId))
+                    .col(integer(SubmissionReviewRatings::ReviewerId))
+                    .col(small_integer(SubmissionReviewRatings::Value))
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_submission_review_ratings_review")
+                            .from(SubmissionReviewRatings::Table, SubmissionReviewRatings::ReviewId)
+                            .to(SubmissionReviews::Table, SubmissionReviews::Id)
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_submission_review_ratings_reviewer")
+                            .from(SubmissionReviewRatings::Table, SubmissionReviewRatings::ReviewerId)
+                            .to(Users::Table, Users::Id)
+                    )
                     .to_owned()
             )
             .await?;
@@ -63,6 +119,14 @@ impl MigrationTrait for Migration {
 
         manager
             .drop_table(Table::drop().table(Submissions::Table).to_owned())
+            .await?;
+
+        manager
+            .drop_table(Table::drop().table(SubmissionRatings::Table).to_owned())
+            .await?;
+
+        manager
+            .drop_table(Table::drop().table(SubmissionReviewRatings::Table).to_owned())
             .await?;
 
         Ok(())

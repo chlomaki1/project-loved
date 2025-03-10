@@ -48,7 +48,7 @@ pub enum Relation {
     Beatmaps,
     Beatmapsets,
     RoleAssignments,
-    Submissions,
+    SubmissionReviews,
 }
 
 impl ColumnTrait for Column {
@@ -71,7 +71,7 @@ impl RelationTrait for Relation {
             Self::Beatmaps => Entity::has_many(super::beatmaps::Entity).into(),
             Self::Beatmapsets => Entity::has_many(super::beatmapsets::Entity).into(),
             Self::RoleAssignments => Entity::has_many(super::role_assignments::Entity).into(),
-            Self::Submissions => Entity::has_many(super::submissions::Entity).into(),
+            Self::SubmissionReviews => Entity::has_many(super::submission_reviews::Entity).into(),
         }
     }
 }
@@ -94,9 +94,9 @@ impl Related<super::role_assignments::Entity> for Entity {
     }
 }
 
-impl Related<super::submissions::Entity> for Entity {
+impl Related<super::submission_reviews::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Submissions.def()
+        Relation::SubmissionReviews.def()
     }
 }
 

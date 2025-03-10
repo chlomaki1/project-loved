@@ -22,7 +22,6 @@ impl Parse for GenerateDisplayInput {
     fn parse(input: ParseStream) -> Result<Self> {
         let attrs: Vec<Attribute> = input.call(Attribute::parse_outer)?;
 
-        // Check for exactly one #[display(...)] attribute.
         if attrs.len() != 1 {
             return Err(input.error("expected exactly one #[display(...)] attribute"));
         }
@@ -33,16 +32,13 @@ impl Parse for GenerateDisplayInput {
             return Err(input.error("expected attribute #[display(...)]"));
         }
 
-        // Parse the #[display(...)] attribute.
         let display_attr = syn::parse2::<DisplayAttr>(attr.tokens.clone())?;
         let struct_name: Ident = input.parse()?;
         let mut fields = Vec::new();
         let content;
         
-        // Parse the struct body.
         braced!(content in input);
 
-        // Parse the fields.
         while !content.is_empty() {
             let field = content.parse::<DisplayField>()?;
             fields.push(field);
@@ -98,13 +94,11 @@ pub fn generate_display(input: TokenStream) -> TokenStream {
     
     let model = display_attr.model;
     
-    // Generate the base field with #[serde(skip)].
     let base_field = quote! {
         #[serde(skip)]
         pub base: #model
     };
     
-    // Generate the additional fields.
     let fields_struct = fields.iter().map(|f| {
         let name = &f.name;
         let field_type = &f.field_type;
@@ -113,7 +107,6 @@ pub fn generate_display(input: TokenStream) -> TokenStream {
         }
     });
     
-    // Generate the field initializations in the new() function.
     let fields_init = fields.iter().map(|f| {
         let name = &f.name;
         let initializer = &f.initializer;
@@ -122,7 +115,6 @@ pub fn generate_display(input: TokenStream) -> TokenStream {
         }
     });
     
-    // Generate the struct and implementation.
     let expanded = quote! {
         #[derive(serde::Serialize)]
         pub struct #struct_name {
@@ -161,35 +153,31 @@ pub fn request_error(_attr: TokenStream, input: TokenStream) -> TokenStream {
         }
     };
 
-    // Prepare containers for the new variant definitions and match arms.
     let mut new_variants = Vec::new();
     let mut status_code_arms = Vec::new();
     let mut display_arms = Vec::new();
     let mut error_code_arms = Vec::new();
 
-    // Process each variant.
     for variant in data_enum.variants.iter() {
         let variant_ident = &variant.ident;
         let variant_fields = &variant.fields;
 
-        // Preserve all attributes except the #[error(...)] attribute.
         let preserved_attrs: Vec<_> = variant
             .attrs
             .iter()
             .filter(|attr| !attr.path.is_ident("error"))
             .collect();
 
-        // Look for the #[error(...)] attribute and process it.
         let error_attr = variant
             .attrs
             .iter()
             .find(|attr| attr.path.is_ident("error"));
 
         if let Some(attr) = error_attr {
-            // Parse the attribute expecting a list of three arguments.
             let meta = attr.parse_meta().expect("Unable to parse error attribute");
             if let Meta::List(meta_list) = meta {
                 let nested: Vec<_> = meta_list.nested.into_iter().collect();
+
                 if nested.len() != 3 {
                     return syn::Error::new_spanned(
                         attr,
@@ -218,6 +206,7 @@ pub fn request_error(_attr: TokenStream, input: TokenStream) -> TokenStream {
                             #enum_name::#variant_ident { .. } => write!(f, #display_msg),
                         });
                     }
+
                     syn::Fields::Unit => {
                         // For unit-like variants, match directly on the variant.
                         status_code_arms.push(quote! {
@@ -233,15 +222,10 @@ pub fn request_error(_attr: TokenStream, input: TokenStream) -> TokenStream {
                         });
                     }
                 }
-
-
-                // Create a new attribute (for example, a display attribute) that uses the display message.
-                let new_attr: syn::Attribute = syn::parse_quote!(#[display(fmt = #display_msg)]);
                 
-                // Rebuild the variant without the original #[error] attribute and with the new attribute.
                 new_variants.push(quote! {
                     #(#preserved_attrs)*
-                    #new_attr
+                    #[display(fmt = #display_msg)]
                     #variant_ident #variant_fields
                 });
             } else {
@@ -253,8 +237,6 @@ pub fn request_error(_attr: TokenStream, input: TokenStream) -> TokenStream {
                 .into();
             }
         } else {
-            // If no #[error] attribute is found, you can choose to either skip this variant
-            // or include it unchanged. Here, we'll include it unchanged.
             new_variants.push(quote! {
                 #variant_ident #variant_fields
             });
