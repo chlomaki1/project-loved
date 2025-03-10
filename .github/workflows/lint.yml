@@ -18,8 +18,9 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
-      - name: Install Dependencies
-        run: cargo install --locked cargo-check cargo-clippy
+          profile: minimal
+      - name: Install Clippy
+        run: rustup component add clippy
       - name: Check
         run: cargo check
       - name: Clippy
