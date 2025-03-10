@@ -5,7 +5,8 @@
   "scripts": {
     "website:dev": "npx next dev ./apps/website",
     "website:install": "yarn install --cwd ./apps/website",
-    "athena:generate": "sea-orm-cli generate entity --expanded-format -o packages/athena/src/entities"
+    "athena:generate": "sea-orm-cli generate entity --expanded-format -o packages/athena/src/entities",
+    "lint:rust": "cargo clippy -- -D clippy::all -A clippy::new_without_default"
   },
   "keywords": [],
   "author": "",

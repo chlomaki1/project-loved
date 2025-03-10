@@ -1,4 +1,4 @@
-use std::{env, io};
+use std::env;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenvy::dotenv;
 use errors::LovedError;

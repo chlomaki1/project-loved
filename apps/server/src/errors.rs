@@ -107,16 +107,15 @@ impl From<OsuError> for LovedError {
 impl From<DbErr> for LovedError {
     fn from(error: DbErr) -> Self {
         println!("db error: {:?}", error);
-        match error {
-            _ => LovedError::DatabaseError
-        }
+        
+        LovedError::DatabaseError
     }
 }
 
 impl From<redis::RedisError> for LovedError {
     fn from(error: redis::RedisError) -> LovedError {
-        match error {
-            _ => LovedError::DatabaseError
-        }
+        println!("redis error: {:?}", error);
+        
+        LovedError::DatabaseError
     }
 }

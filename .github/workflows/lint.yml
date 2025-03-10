@@ -24,7 +24,7 @@ jobs:
       - name: Check
         run: cargo check --all
       - name: Clippy
-        run: cargo clippy -- -D clippy::all
+        run: cargo clippy -- -D clippy::all -A clippy::new_without_default
 
   website-ts-check:
     name: Website Lint

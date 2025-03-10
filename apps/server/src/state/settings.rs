@@ -11,7 +11,6 @@ struct LovedSettings {
 }
 
 #[derive(Clone)]
-
 pub struct LovedSettingsManager {
     settings: HashMap<String, serde_json::Value>,
     settings_path: PathBuf,

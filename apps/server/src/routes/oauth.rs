@@ -80,7 +80,7 @@ pub async fn login_token_callback(
 ) -> impl Responder {
     let token_state = serde_json::from_str(query.state.clone().as_str());
 
-    if let Err(_) = token_state {
+    if token_state.is_err() {
         return Err(LovedError::InvalidTokenState);
     }
 
@@ -130,7 +130,7 @@ pub async fn login_token_callback(
                     id: sea_orm::ActiveValue::Set(user.user_id.try_into().unwrap()),
                     username: sea_orm::ActiveValue::Set(user.username.to_string()),
                     country: sea_orm::ActiveValue::Set(Some(user.country_code.to_string())),
-                    restricted: sea_orm::ActiveValue::Set(user.is_restricted.unwrap_or_else(|| false)),
+                    restricted: sea_orm::ActiveValue::Set(user.is_restricted.unwrap_or(false)),
                     api_fetched_at: sea_orm::ActiveValue::Set(chrono::Utc::now().naive_utc()),
                     tokens: sea_orm::ActiveValue::Set(serde_json::json!({})) // TODO: Securely store tokens
                 }, &state.db_pool).await?.into_display());

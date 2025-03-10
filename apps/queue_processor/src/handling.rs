@@ -1,7 +1,6 @@
 use redis::AsyncCommands;
 use tokio_cron_scheduler::{Job, JobScheduler};
 use std::{collections::HashMap, sync::Arc, error::Error};
-use tokio;
 use async_trait::async_trait;
 
 #[async_trait]
@@ -39,7 +38,6 @@ impl HandlerRegistry {
     pub fn register_handler<H: QueueHandler + 'static>(&mut self, handler: H) {
         self.handlers
             .insert(handler.queue_name().to_string(), Arc::new(handler));
-
     }
 
     /// Start a listener task for each registered handler.
@@ -59,7 +57,7 @@ impl HandlerRegistry {
                     .expect("Failed to create Redis client");
 
                 let mut con = client
-                    .get_async_connection()
+                    .get_multiplexed_async_connection()
                     .await
                     .expect("Failed to get Redis connection");
 

@@ -15,7 +15,7 @@ impl LovedEnvironment {
         env
     }
 
-    pub fn initialize(&mut self) -> () {
+    pub fn initialize(&mut self) {
         self.database_url = self.get("DATABASE_URL").unwrap();
         self.redis_url = self.get("REDIS_URL").unwrap();
     }
