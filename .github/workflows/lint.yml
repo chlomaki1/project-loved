@@ -1,0 +1,42 @@
+name: Lint and Format
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  rust-check:
+    name: Rust Lint and Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly
+      - name: Install Dependencies
+        run: cargo install --locked cargo-check cargo-clippy
+      - name: Check
+        run: cargo check
+      - name: Clippy
+        run: cargo clippy -- -D clippy::all
+
+  website-ts-check:
+    name: Website Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/website
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      # TODO: implement linting
+      #- run: yarn lint
