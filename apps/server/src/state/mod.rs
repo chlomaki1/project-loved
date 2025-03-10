@@ -1,20 +1,21 @@
-
 use athena::environment::LovedEnvironment;
 use rosu_v2::error::OsuError;
 use rosu_v2::prelude::Scopes;
 use rosu_v2::Osu;
 use sea_orm::{ConnectOptions, ConnectionTrait, Database, DatabaseConnection, DbErr, ExecResult, Statement};
 use settings::LovedSettingsManager;
+use tokio::sync::OnceCell;
 
 pub mod settings;
+
+static OSU_CLIENT: OnceCell<Osu> = OnceCell::const_new();
 
 #[derive(Clone)]
 pub struct LovedState {
     pub env: LovedEnvironment,
     pub settings: LovedSettingsManager,
     pub db_pool: DatabaseConnection,
-    pub redis_pool: redis::Client,
-    pub osu_client: Osu
+    pub redis_pool: redis::Client
 }
 
 impl LovedState {
@@ -26,21 +27,36 @@ impl LovedState {
         options.max_connections(10)
             .min_connections(5);
 
+        unsafe {
+            // Has to be unsafe because `Osu` doesn't implement `Debug`
+            // ...or really anything.
+            OSU_CLIENT.set(
+                Osu::builder()
+                    .url(env.get::<String>("OSU_URL").unwrap())
+                    .client_id(env.get::<u64>("OSU_CLIENT_ID").unwrap())
+                    .client_secret(env.get::<String>("OSU_CLIENT_SECRET").unwrap())
+                    .build()
+                    .await
+                    .expect("Failed to create osu! API client")
+            ).unwrap_unchecked();
+        }
+
         LovedState {
             env: env.clone(),
             settings: LovedSettingsManager::new(),
             db_pool: Database::connect(options)
                 .await
                 .expect("Failed to connect to database"),
-            redis_pool: redis::Client::open(&*env.redis_url.clone()).unwrap(),
-            osu_client: Osu::new(env.get::<u64>("OSU_CLIENT_ID").unwrap(), env.get::<String>("OSU_CLIENT_SECRET").unwrap())
-                .await
-                .expect("Failed to create osu! API client")
+            redis_pool: redis::Client::open(&*env.redis_url.clone()).unwrap()
         }
     }
 
     pub async fn execute(&self, stmt: Statement) -> Result<ExecResult, DbErr> {
         self.db_pool.execute(stmt).await
+    }
+
+    pub async fn execute_osu<T>(&self, func: impl Fn(&Osu) -> Result<T, OsuError>) -> Result<T, OsuError> {
+        func(OSU_CLIENT.get().unwrap())
     }
 
     pub async fn run(&self, query: &str) -> Result<ExecResult, DbErr> {
