@@ -20,6 +20,21 @@ pub enum LovedError {
     #[error(StatusCode::BAD_REQUEST, "ERR_INVALID_TOKEN_STATE", "The provided token state is invalid.")]
     InvalidTokenState,
 
+    /// `400 BAD REQUEST`
+    /// An error that occurs because the client sent an invalid limit.
+    #[error(StatusCode::BAD_REQUEST, "ERR_INVALID_LIMIT", "The provided limit is invalid.")]    
+    PaginationLimitInvalid {
+        min: usize,
+        max: usize
+    },
+
+    /// PAGINATION ///
+    
+    /// `400 BAD REQUEST`
+    /// An error that occurs because the client sent an invalid page number.
+    #[error(StatusCode::BAD_REQUEST, "ERR_INVALID_PAGE", "The provided page number is invalid.")]
+    InvalidPage,
+
     /// GENERIC ///
 
     /// `400 BAD REQUEST`

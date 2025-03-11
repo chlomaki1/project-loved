@@ -8,6 +8,7 @@ pub mod routes;
 pub mod service;
 pub mod state;
 pub mod errors;
+pub mod extractors;
 
 #[cfg(unix)]
 const SOCKET_PATH: &str = "/tmp/loved_server.sock";
