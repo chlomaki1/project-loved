@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    braced, parenthesized, parse::{Parse, ParseStream, Result}, parse_macro_input, Attribute, Data, DeriveInput, Expr, Ident, Meta, Path, Token, Type
+    braced, parenthesized, parse::{Parse, ParseStream, Result}, parse_macro_input, Attribute, Data, DeriveInput, Expr, Ident, ImplItemMethod, Meta, Path, Token, Type
 };
 
 /// The input format is:
@@ -16,6 +16,7 @@ struct GenerateDisplayInput {
     display_attr: DisplayAttr,
     struct_name: Ident,
     fields: Vec<DisplayField>,
+    methods: Vec<ImplItemMethod>
 }
 
 impl Parse for GenerateDisplayInput {
@@ -48,8 +49,15 @@ impl Parse for GenerateDisplayInput {
                 let _ : Token![,] = content.parse()?;
             }
         }
+
+        let mut methods = Vec::new();
+        while !input.is_empty() {
+            let method = input.parse::<ImplItemMethod>()?;
+
+            methods.push(method);
+        }
         
-        Ok(GenerateDisplayInput { display_attr, struct_name, fields })
+        Ok(GenerateDisplayInput { display_attr, struct_name, fields, methods })
     }
 }
 
@@ -90,6 +98,7 @@ pub fn generate_display(input: TokenStream) -> TokenStream {
         display_attr,
         struct_name,
         fields,
+        methods
     } = parse_macro_input!(input as GenerateDisplayInput);
     
     let model = display_attr.model;
@@ -129,6 +138,8 @@ pub fn generate_display(input: TokenStream) -> TokenStream {
                     #(#fields_init,)*
                 }
             }
+
+            #(#methods)*
         }
     };
     

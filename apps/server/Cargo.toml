@@ -20,3 +20,5 @@ redis = "0.29.1"
 rosu-v2 = { git = "https://github.com/chlomaki1/rosu-v2", branch = "lazer" }
 uuid = { version = "1.15.1", features = [ "v4" ] }
 chrono = "0.4.40"
+futures-util = "0.3"
+querystring = "1.1.0"

@@ -2,6 +2,7 @@ use actix_web::HttpRequest;
 use crate::{errors::LovedError, service::Response};
 
 pub mod oauth;
+pub mod submissions;
 
 pub async fn handle_default(request: HttpRequest) -> Result<Response, LovedError> {
     if request.resource_map().has_resource(request.path()) {

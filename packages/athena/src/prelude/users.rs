@@ -1,12 +1,21 @@
 use athena_macros::generate_display;
-use sea_orm::{ColumnTrait, DbErr, EntityTrait, ActiveModelTrait, QueryFilter,};
-use crate::{entities::{role_assignments, roles, users}, errors::AthenaError};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DbErr, EntityTrait, QueryFilter, TryIntoModel};
+use crate::{entities::{self, role_assignments, roles, users}, errors::AthenaError};
 use super::roles::{DisplayRole, FullRole};
 
 generate_display! {
     #[display(users::Model)]
     DisplayUser {
         roles = Vec<DisplayRole>: Vec::new()
+    }
+
+    pub fn default() -> Self {
+        DisplayUser {
+            base: <users::ActiveModel as ActiveModelTrait>::default()
+                .try_into_model()
+                .unwrap(),
+            roles: Vec::new()
+        }
     }
 }
 
@@ -26,7 +35,7 @@ pub struct FullUser {
 }
 
 impl FullUser {
-    pub async fn create(user: users::ActiveModel, conn: &sea_orm::DatabaseConnection) -> Result<Self, DbErr> {
+    pub async fn create(user: users::ActiveModel, conn: &sea_orm::DatabaseConnection) -> Result<Self, AthenaError> {
         let base = user.insert(conn).await?;
 
         Ok(FullUser { base, roles: Vec::new() })
@@ -47,7 +56,7 @@ impl FullUser {
         }
     }
 
-    pub async fn update(model: users::ActiveModel, conn: &sea_orm::DatabaseConnection) -> Result<Self, DbErr> {
+    pub async fn update(model: users::ActiveModel, conn: &sea_orm::DatabaseConnection) -> Result<Self, AthenaError> {
         let base = model.update(conn).await?;
 
         Ok(FullUser {

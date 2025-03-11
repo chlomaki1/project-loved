@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use athena::environment::LovedEnvironment;
 use rosu_v2::error::OsuError;
 use rosu_v2::prelude::Scopes;
@@ -54,9 +56,11 @@ impl LovedState {
     pub async fn execute(&self, stmt: Statement) -> Result<ExecResult, DbErr> {
         self.db_pool.execute(stmt).await
     }
-
-    pub async fn execute_osu<T>(&self, func: impl Fn(&Osu) -> Result<T, OsuError>) -> Result<T, OsuError> {
-        func(OSU_CLIENT.get().unwrap())
+    
+    pub async fn execute_osu<T, Fut>(&self, func: impl Fn(&Osu) -> Fut) -> Result<T, OsuError>
+        where Fut: Future<Output = Result<T, OsuError>>,
+    {
+        func(OSU_CLIENT.get().unwrap()).await
     }
 
     pub async fn run(&self, query: &str) -> Result<ExecResult, DbErr> {
