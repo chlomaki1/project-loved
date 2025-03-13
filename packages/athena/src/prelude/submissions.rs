@@ -1,5 +1,5 @@
 use athena_macros::generate_display;
-use sea_orm::{ActiveModelTrait, DbErr, EntityTrait};
+use sea_orm::{ActiveModelTrait, DbErr, EntityTrait, Select};
 use crate::{entities::submissions, errors::AthenaError};
 use super::{users::{DisplayUser, FullUser}, AsyncFromDatabase};
 
@@ -10,6 +10,7 @@ generate_display! {
         submitter = DisplayUser: DisplayUser::default()
     } 
 }
+
 
 pub struct FullSubmission {
     pub base: submissions::Model,
@@ -33,7 +34,32 @@ impl FullSubmission {
             
             Ok(FullSubmission { base, submitter })
         } else {
-            Err(AthenaError::ModelNotFound("submission".to_string()))
+            Err(AthenaError::ModelNotFound("submission"))
+        }
+    }
+
+    pub async fn find(
+        conn: &sea_orm::DatabaseConnection,
+        fun: impl FnOnce(Select<submissions::Entity>) -> Select<submissions::Entity>,
+    ) -> Result<Vec<Self>, AthenaError> {
+        let base = submissions::Entity::find();
+        let base = fun(base);
+    
+        let base = base.all(conn).await?;
+        let mut full_submissions = Vec::new();
+    
+        for submission in base {
+            full_submissions.push(FullSubmission::from_async(submission, conn).await);
+        }
+    
+        Ok(full_submissions)
+    }
+
+    pub fn into_display(self) -> DisplaySubmission {
+        DisplaySubmission { 
+            base: self.base.clone(), 
+            id: self.base.id,
+            submitter: self.submitter.into_display()
         }
     }
 }

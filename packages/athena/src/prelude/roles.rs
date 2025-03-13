@@ -33,7 +33,7 @@ impl FullRole {
                 permissions: Permissions::from_bits(base.permissions).unwrap_or(Permissions::empty())
             })
         } else {
-            Err(AthenaError::ModelNotFound("Role".to_string()))
+            Err(AthenaError::ModelNotFound("role"))
         }
     }
 

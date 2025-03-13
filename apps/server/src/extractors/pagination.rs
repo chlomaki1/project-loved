@@ -62,8 +62,8 @@ impl<Output, const HARD_LIMIT: usize> FromRequest for Pagination<Output, HARD_LI
 impl<Output, const HARD_LIMIT: usize> Pagination<Output, HARD_LIMIT>
     where Output: Serialize
 {
-    pub fn get_page_offset(&self) -> usize {
-        (self.page - 1) * self.limit
+    pub fn get_page_offset(&self) -> u32 {
+        (self.page - 1) * self.limit as u32
     }
 
     pub async fn provide<Fut>(mut self, fun: impl FnOnce(&Pagination<Output, HARD_LIMIT>) -> Fut) -> Result<Self, LovedError>

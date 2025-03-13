@@ -7,7 +7,7 @@ pub enum AthenaError {
     DbErr(DbErr),
 
     #[error("Failed to acquire model of type {0}")]
-    ModelNotFound(String)
+    ModelNotFound(&'static str)
 }
 
 impl From<DbErr> for AthenaError {

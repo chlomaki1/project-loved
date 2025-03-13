@@ -1,5 +1,5 @@
 use actix_web::{error::JsonPayloadError, http::StatusCode};
-use athena::RequestError;
+use athena::{errors::AthenaError, RequestError};
 use rosu_v2::error::OsuError;
 use sea_orm::DbErr;
 
@@ -47,6 +47,15 @@ pub enum LovedError {
     /// The client tried to request an endpoint that doesn't exist.
     #[error(StatusCode::NOT_FOUND, "ERR_NOT_FOUND", "The requested endpoint was not found.")]
     NotFound,
+    
+    /// `404 NOT FOUND`
+    /// An error that occurs because the client tried to access a resource
+    /// that doesn't exist.
+    #[error(StatusCode::NOT_FOUND, "ERR_RESOURCE_NOT_FOUND", "No {model} with this identifier could be found.")]
+    ModelNotFound {
+        #[serde(skip)]
+        model: &'static str
+    },
 
     /// `405 METHOD NOT ALLOWED`
     /// An error that occurs because the client tried to access an endpoint 
@@ -132,5 +141,14 @@ impl From<redis::RedisError> for LovedError {
         println!("redis error: {:?}", error);
         
         LovedError::DatabaseError
+    }
+}
+
+impl From<AthenaError> for LovedError {
+    fn from(error: AthenaError) -> Self {
+        match error {
+            AthenaError::DbErr(_) => LovedError::DatabaseError,
+            AthenaError::ModelNotFound(model) => LovedError::ModelNotFound { model }
+        }
     }
 }

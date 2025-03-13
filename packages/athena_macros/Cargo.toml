@@ -7,5 +7,5 @@ edition = "2024"
 proc-macro = true
 
 [dependencies]
-syn = "1.0" # I just don't really like 2.x's breaking changes.
+syn = { version = "1", features = ["full"] } # I just don't really like 2.x's breaking changes.
 quote = "1.0"

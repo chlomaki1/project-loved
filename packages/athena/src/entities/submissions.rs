@@ -44,6 +44,7 @@ impl PrimaryKeyTrait for PrimaryKey {
 #[derive(Copy, Clone, Debug, EnumIter)]
 pub enum Relation {
     Beatmapsets,
+    SubmissionRatings,
     SubmissionReviews,
 }
 
@@ -67,6 +68,7 @@ impl RelationTrait for Relation {
                 .from(Column::BeatmapsetId)
                 .to(super::beatmapsets::Column::Id)
                 .into(),
+            Self::SubmissionRatings => Entity::has_many(super::submission_ratings::Entity).into(),
             Self::SubmissionReviews => Entity::has_many(super::submission_reviews::Entity).into(),
         }
     }
@@ -75,6 +77,12 @@ impl RelationTrait for Relation {
 impl Related<super::beatmapsets::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Beatmapsets.def()
+    }
+}
+
+impl Related<super::submission_ratings::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::SubmissionRatings.def()
     }
 }
 

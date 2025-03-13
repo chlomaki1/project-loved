@@ -25,7 +25,7 @@ pub struct FullBeatmap {
 impl FullBeatmap {
     pub async fn create(beatmap: beatmaps::ActiveModel, conn: &sea_orm::DatabaseConnection) -> Result<Self, DbErr> {
         let base = beatmap.insert(conn).await?;
-        let beatmapset = DisplayBeatmapset::from(beatmapset::Model::find_by_id(base.beatmapset_id).one(conn).await?);
+        let beatmapset = DisplayBeatmapset::new(beatmapsets::Entity::find_by_id(base.beatmapset_id).one(conn).await?.unwrap());
         Ok(FullBeatmap { base, beatmapset })
     }
 
@@ -45,10 +45,10 @@ impl FullBeatmap {
             .await?;
 
         if let Some(base) = base {
-            let beatmapset = DisplayBeatmapset::from(beatmapset::Model::find_by_id(base.beatmapset_id).one(conn).await?);
+            let beatmapset = DisplayBeatmapset::new(beatmapsets::Entity::find_by_id(base.beatmapset_id).one(conn).await?.unwrap());
             Ok(FullBeatmap { base, beatmapset })
         } else {
-            Err(AthenaError::ModelNotFound("beatmap".to_string()))
+            Err(AthenaError::ModelNotFound("beatmap"))
         }
     }
 }

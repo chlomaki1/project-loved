@@ -62,47 +62,17 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(SubmissionRatings::Table)
+                    .table(ReviewRatings::Table)
                     .if_not_exists()
-                    .col(pk_auto(SubmissionRatings::Id))
-                    .col(integer(SubmissionRatings::SubmissionId))
-                    .col(integer(SubmissionRatings::ReviewerId))
-                    .col(small_integer(SubmissionRatings::Value))
+                    .col(pk_auto(ReviewRatings::Id))
+                    .col(enumeration(ReviewRatings::ReviewType, "ReviewType", vec!["submission", "review"]))
+                    .col(integer(ReviewRatings::ObjectId))
+                    .col(integer(ReviewRatings::ReviewerId))
+                    .col(small_integer(ReviewRatings::Value))
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk_submission_ratings_submission")
-                            .from(SubmissionRatings::Table, SubmissionRatings::SubmissionId)
-                            .to(Submissions::Table, Submissions::Id)
-                    )
-                    .foreign_key(
-                        ForeignKey::create()
-                            .name("fk_submission_ratings_reviewer")
-                            .from(SubmissionRatings::Table, SubmissionRatings::ReviewerId)
-                            .to(Users::Table, Users::Id)
-                    )
-                    .to_owned()
-            )
-            .await?;
-
-        manager
-            .create_table(
-                Table::create()
-                    .table(SubmissionReviewRatings::Table)
-                    .if_not_exists()
-                    .col(pk_auto(SubmissionReviewRatings::Id))
-                    .col(integer(SubmissionReviewRatings::ReviewId))
-                    .col(integer(SubmissionReviewRatings::ReviewerId))
-                    .col(small_integer(SubmissionReviewRatings::Value))
-                    .foreign_key(
-                        ForeignKey::create()
-                            .name("fk_submission_review_ratings_review")
-                            .from(SubmissionReviewRatings::Table, SubmissionReviewRatings::ReviewId)
-                            .to(SubmissionReviews::Table, SubmissionReviews::Id)
-                    )
-                    .foreign_key(
-                        ForeignKey::create()
-                            .name("fk_submission_review_ratings_reviewer")
-                            .from(SubmissionReviewRatings::Table, SubmissionReviewRatings::ReviewerId)
+                            .name("fk_review_ratings_reviewer")
+                            .from(ReviewRatings::Table, ReviewRatings::ReviewerId)
                             .to(Users::Table, Users::Id)
                     )
                     .to_owned()
@@ -122,11 +92,7 @@ impl MigrationTrait for Migration {
             .await?;
 
         manager
-            .drop_table(Table::drop().table(SubmissionRatings::Table).to_owned())
-            .await?;
-
-        manager
-            .drop_table(Table::drop().table(SubmissionReviewRatings::Table).to_owned())
+            .drop_table(Table::drop().table(ReviewRatings::Table).to_owned())
             .await?;
 
         Ok(())
@@ -155,21 +121,13 @@ pub enum SubmissionReviews {
 }
 
 #[derive(DeriveIden)]
-pub enum SubmissionRatings {
+pub enum ReviewRatings {
     Table,
     Id,
-    SubmissionId,
+    ReviewType, // This will be of type ReviewType
+    ObjectId,   // This will replace SubmissionId and ReviewId
     ReviewerId,
-    Value
-}
-
-#[derive(DeriveIden)]
-pub enum SubmissionReviewRatings {
-    Table,
-    Id,
-    ReviewId,
-    ReviewerId,
-    Value
+    Value,
 }
 
 #[derive(DeriveIden)]

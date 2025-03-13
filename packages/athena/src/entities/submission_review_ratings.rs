@@ -7,28 +7,24 @@ pub struct Entity;
 
 impl EntityName for Entity {
     fn table_name(&self) -> &str {
-        "submission_reviews"
+        "submission_review_ratings"
     }
 }
 
 #[derive(Clone, Debug, PartialEq, DeriveModel, DeriveActiveModel, Eq)]
 pub struct Model {
     pub id: i32,
-    pub submission_id: i32,
+    pub review_id: i32,
     pub reviewer_id: i32,
-    pub parent_id: Option<i32>,
-    pub game_mode: i16,
-    pub content: String,
+    pub value: i16,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
 pub enum Column {
     Id,
-    SubmissionId,
+    ReviewId,
     ReviewerId,
-    ParentId,
-    GameMode,
-    Content,
+    Value,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DerivePrimaryKey)]
@@ -45,9 +41,7 @@ impl PrimaryKeyTrait for PrimaryKey {
 
 #[derive(Copy, Clone, Debug, EnumIter)]
 pub enum Relation {
-    SubmissionReviewRatings,
-    SelfRef,
-    Submissions,
+    SubmissionReviews,
     Users,
 }
 
@@ -56,11 +50,9 @@ impl ColumnTrait for Column {
     fn def(&self) -> ColumnDef {
         match self {
             Self::Id => ColumnType::Integer.def(),
-            Self::SubmissionId => ColumnType::Integer.def(),
+            Self::ReviewId => ColumnType::Integer.def(),
             Self::ReviewerId => ColumnType::Integer.def(),
-            Self::ParentId => ColumnType::Integer.def().null(),
-            Self::GameMode => ColumnType::SmallInteger.def().unique(),
-            Self::Content => ColumnType::Text.def(),
+            Self::Value => ColumnType::SmallInteger.def(),
         }
     }
 }
@@ -68,16 +60,9 @@ impl ColumnTrait for Column {
 impl RelationTrait for Relation {
     fn def(&self) -> RelationDef {
         match self {
-            Self::SubmissionReviewRatings => {
-                Entity::has_many(super::submission_review_ratings::Entity).into()
-            }
-            Self::SelfRef => Entity::belongs_to(Entity)
-                .from(Column::ParentId)
-                .to(Column::Id)
-                .into(),
-            Self::Submissions => Entity::belongs_to(super::submissions::Entity)
-                .from(Column::SubmissionId)
-                .to(super::submissions::Column::Id)
+            Self::SubmissionReviews => Entity::belongs_to(super::submission_reviews::Entity)
+                .from(Column::ReviewId)
+                .to(super::submission_reviews::Column::Id)
                 .into(),
             Self::Users => Entity::belongs_to(super::users::Entity)
                 .from(Column::ReviewerId)
@@ -87,15 +72,9 @@ impl RelationTrait for Relation {
     }
 }
 
-impl Related<super::submission_review_ratings::Entity> for Entity {
+impl Related<super::submission_reviews::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::SubmissionReviewRatings.def()
-    }
-}
-
-impl Related<super::submissions::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Submissions.def()
+        Relation::SubmissionReviews.def()
     }
 }
 

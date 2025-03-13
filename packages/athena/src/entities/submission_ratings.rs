@@ -7,7 +7,7 @@ pub struct Entity;
 
 impl EntityName for Entity {
     fn table_name(&self) -> &str {
-        "submission_reviews"
+        "submission_ratings"
     }
 }
 
@@ -16,9 +16,7 @@ pub struct Model {
     pub id: i32,
     pub submission_id: i32,
     pub reviewer_id: i32,
-    pub parent_id: Option<i32>,
-    pub game_mode: i16,
-    pub content: String,
+    pub value: i16,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
@@ -26,9 +24,7 @@ pub enum Column {
     Id,
     SubmissionId,
     ReviewerId,
-    ParentId,
-    GameMode,
-    Content,
+    Value,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DerivePrimaryKey)]
@@ -45,8 +41,6 @@ impl PrimaryKeyTrait for PrimaryKey {
 
 #[derive(Copy, Clone, Debug, EnumIter)]
 pub enum Relation {
-    SubmissionReviewRatings,
-    SelfRef,
     Submissions,
     Users,
 }
@@ -58,9 +52,7 @@ impl ColumnTrait for Column {
             Self::Id => ColumnType::Integer.def(),
             Self::SubmissionId => ColumnType::Integer.def(),
             Self::ReviewerId => ColumnType::Integer.def(),
-            Self::ParentId => ColumnType::Integer.def().null(),
-            Self::GameMode => ColumnType::SmallInteger.def().unique(),
-            Self::Content => ColumnType::Text.def(),
+            Self::Value => ColumnType::SmallInteger.def(),
         }
     }
 }
@@ -68,13 +60,6 @@ impl ColumnTrait for Column {
 impl RelationTrait for Relation {
     fn def(&self) -> RelationDef {
         match self {
-            Self::SubmissionReviewRatings => {
-                Entity::has_many(super::submission_review_ratings::Entity).into()
-            }
-            Self::SelfRef => Entity::belongs_to(Entity)
-                .from(Column::ParentId)
-                .to(Column::Id)
-                .into(),
             Self::Submissions => Entity::belongs_to(super::submissions::Entity)
                 .from(Column::SubmissionId)
                 .to(super::submissions::Column::Id)
@@ -84,12 +69,6 @@ impl RelationTrait for Relation {
                 .to(super::users::Column::Id)
                 .into(),
         }
-    }
-}
-
-impl Related<super::submission_review_ratings::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::SubmissionReviewRatings.def()
     }
 }
 

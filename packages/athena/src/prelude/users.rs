@@ -52,7 +52,7 @@ impl FullUser {
                 roles: get_user_roles(base.id, conn).await.unwrap_or(Vec::new())
             })
         } else {
-            Err(AthenaError::ModelNotFound("User".to_string()))
+            Err(AthenaError::ModelNotFound("user"))
         }
     }
 
@@ -65,11 +65,8 @@ impl FullUser {
         })
     }
 
-    pub fn from(model: users::Model) -> Self {
-        FullUser {
-            base: model.clone(),
-            roles: Vec::new()
-        }
+    pub fn from(model: users::Model, roles: Vec<FullRole>) -> Self {
+        FullUser { base: model.clone(), roles }
     }
 
     pub fn into_display(self) -> DisplayUser {
