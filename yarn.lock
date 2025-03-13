@@ -12,6 +12,14 @@
   resolved "https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.33.5.tgz"
   integrity sha512-MpY/o8/8kj+EcnxwvrP4aTJSWw/aZ7JIGR4aBeZkZw5B7/Jn+tY9/VNwtcoGmdT7GfggGIU4kygOMSbYnOrAbg==
 
+"@loved/typescript-config@*", "@loved/typescript-config@file:C:\\chlomaki\\projects\\project-loved\\packages\\typescript-config":
+  version "1.0.0"
+  resolved "file:packages/typescript-config"
+
+"@loved/ui@file:C:\\chlomaki\\projects\\project-loved\\packages\\ui":
+  version "1.0.0"
+  resolved "file:packages/ui"
+
 "@next/env@15.2.1":
   version "15.2.1"
   resolved "https://registry.npmjs.org/@next/env/-/env-15.2.1.tgz"
@@ -352,6 +360,6 @@ undici-types@~6.19.2:
   version "0.1.0"
   resolved "file:apps/website"
   dependencies:
-    next "15.1.7"
+    next "15.2.1"
     react "^19.0.0"
     react-dom "^19.0.0"
