@@ -9,7 +9,7 @@ export default function PopoverDemo() {
 
     return (
         <Popover.Root onOpenChange={setOpen}>
-            <Popover.Trigger className="rounded-md bg-white" onClick={() => setOpen(prev => !prev)}>
+            <Popover.Trigger className="rounded-md bg-white">
                 More info
             </Popover.Trigger>
             <AnimatePresence>
