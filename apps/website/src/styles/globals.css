@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+    --bg-surface: hsl(333, 10%, 10%);
+
+    --surface-level-1: hsla(333, 45%, 70%, 4%);
+    --surface-level-2: hsla(333, 45%, 70%, 8%);
+    --surface-level-3: hsla(333, 45%, 70%, 16%);
+    --surface-level-4: hsla(333, 45%, 70%, 32%);
+    --surface-level-5: hsla(333, 45%, 70%, 64%);
+    --surface-level-6: hsla(333, 45%, 70%, 100%);
+
+    --surface-solid-level-1: #231c1f;
+    --surface-solid-level-2: #2b2025;
+    --surface-solid-level-3: #392a31;
+    --surface-solid-level-4: #573d49;
+    --surface-solid-level-5: #926378;
+    --surface-solid-level-6: #d58eae;
+}
+
+@utility surface-* {
+    background-color: --value(--surface-level-*);
+}
+
+@utility surface-solid-* {
+    background-color: --value(--surface-solid-level-*);
+}
+
+@utility fill-surface-* {
+    fill: --value(--surface-level-*);
+}
+
+@utility fill-surface-solid-* {
+    fill: --value(--surface-solid-level-*);
+}
+
+@utility border-surface-* {
+    outline-color: --value(--surface-level-*);
+}
+
+@utility border-surface-solid-* {
+    outline-color: --value(--surface-solid-level-*);
+}

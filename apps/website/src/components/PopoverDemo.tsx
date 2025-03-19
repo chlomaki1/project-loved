@@ -9,13 +9,17 @@ export default function PopoverDemo() {
 
     return (
         <Popover.Root onOpenChange={setOpen}>
-            <Popover.Trigger className="rounded-md bg-white">
+            <Popover.Trigger className="rounded-md border-surface-solid-2 outline-1 hover:surface-1 transition-colors cursor-pointer">
                 More info
             </Popover.Trigger>
             <AnimatePresence>
                 {open && (
                     <Popover.Portal forceMount>
-                        <Popover.Content asChild className="rounded-md p-5 w-64 bg-red-100">
+                        <Popover.Content
+                            asChild
+                            className="rounded-md p-5 w-64 surface-solid-1 shadow-md"
+                            collisionPadding={{ bottom: 5, top: 5, left: 5, right: 5 }}
+                        >
                             <motion.div
                                 animate="show"
                                 exit="hidden"
@@ -26,7 +30,7 @@ export default function PopoverDemo() {
                                 }}
                             >
                                 Some more info...
-                                <Popover.Arrow className="fill-red-100" />
+                                <Popover.Arrow className="fill-surface-solid-1" />
                             </motion.div>
                         </Popover.Content>
                     </Popover.Portal>

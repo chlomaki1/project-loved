@@ -1,0 +1,6 @@
+@import "./globals.css";
+
+html, body {
+    background-color: var(--bg-surface);
+    color: white;
+}
