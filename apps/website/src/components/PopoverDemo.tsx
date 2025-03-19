@@ -17,7 +17,7 @@ export default function PopoverDemo() {
                     <Popover.Portal forceMount>
                         <Popover.Content
                             asChild
-                            className="rounded-md p-5 w-64 surface-solid-1 shadow-md"
+                            className="rounded-md m-1 p-5 w-64 surface-solid-1 shadow-sm"
                             collisionPadding={{ bottom: 5, top: 5, left: 5, right: 5 }}
                         >
                             <motion.div
@@ -25,12 +25,11 @@ export default function PopoverDemo() {
                                 exit="hidden"
                                 initial="hidden"
                                 variants={{
-                                    hidden: { opacity: 0, y: 10 },
+                                    hidden: { opacity: 0, y: -5 },
                                     show: { opacity: 1, y: 0 }
                                 }}
                             >
                                 Some more info...
-                                <Popover.Arrow className="fill-surface-solid-1" />
                             </motion.div>
                         </Popover.Content>
                     </Popover.Portal>
