@@ -1,7 +1,7 @@
 // @ts-check
 import eslint from "@eslint/js";
-import tsEslint from "typescript-eslint";
 import stylistic from "@stylistic/eslint-plugin";
+import tsEslint from "typescript-eslint";
 
 export default [
     eslint.configs.recommended,
@@ -17,7 +17,10 @@ export default [
             "@stylistic/jsx-indent-props": ["error", 4],
             "@stylistic/comma-dangle": ["warn", "never"],
             "@stylistic/quotes": ["warn", "double"],
-            "@stylistic/semi": ["warn", "always"]
+            "@stylistic/semi": ["warn", "always"],
+            "sort-imports": "warn",
+            "prefer-const": "warn",
+            "no-var": "error"
         }
     }
 ];
