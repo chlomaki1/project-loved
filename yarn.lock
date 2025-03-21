@@ -364,11 +364,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@loved/ui@workspace:packages/ui":
+"@loved/ui@workspace:^, @loved/ui@workspace:packages/ui":
   version: 0.0.0-use.local
   resolution: "@loved/ui@workspace:packages/ui"
   dependencies:
     "@loved/typescript-config": "npm:*"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
   languageName: unknown
   linkType: soft
 
@@ -3505,6 +3509,7 @@ __metadata:
   resolution: "website@workspace:apps/website"
   dependencies:
     "@eslint/js": "npm:^9.22.0"
+    "@loved/ui": "workspace:^"
     "@stylistic/eslint-plugin": "npm:^4.2.0"
     "@tailwindcss/postcss": "npm:^4"
     "@types/node": "npm:^20"

@@ -1,6 +1,7 @@
 import "../styles/index.css";
 
 import { IconoirProvider } from "iconoir-react";
+import { Navbar } from "@loved/ui";
 
 export default function RootLayout({
     children
@@ -16,6 +17,7 @@ export default function RootLayout({
                             height: "1em"
                         }}
                     >
+                        <Navbar />
                         {children}
                     </IconoirProvider>
                 </div>
