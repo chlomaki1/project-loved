@@ -2,13 +2,14 @@ import "../styles/index.css";
 
 import { IconoirProvider } from "iconoir-react";
 import { Navbar } from "@loved/ui";
+import { Torus } from "@/fonts/torus";
 
 export default function RootLayout({
     children
 }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="en">
-            <body>
+            <body className={`${Torus.className}`}>
                 <div id="app">
                     <IconoirProvider
                         iconProps={{
