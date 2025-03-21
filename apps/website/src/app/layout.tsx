@@ -1,5 +1,7 @@
 import "../styles/index.css";
 
+import { IconoirProvider } from "iconoir-react";
+
 export default function RootLayout({
     children
 }: Readonly<{ children: React.ReactNode }>) {
@@ -7,7 +9,15 @@ export default function RootLayout({
         <html lang="en">
             <body>
                 <div id="app">
-                    {children}
+                    <IconoirProvider
+                        iconProps={{
+                            strokeWidth: 2,
+                            width: "1em",
+                            height: "1em"
+                        }}
+                    >
+                        {children}
+                    </IconoirProvider>
                 </div>
             </body>
         </html>

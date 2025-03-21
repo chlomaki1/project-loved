@@ -1,7 +1,8 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
+import { NavArrowDown } from "iconoir-react";
 import { Popover } from "radix-ui";
-import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 
 export default function PopoverDemo() {
@@ -9,8 +10,21 @@ export default function PopoverDemo() {
 
     return (
         <Popover.Root onOpenChange={setOpen}>
-            <Popover.Trigger className="rounded-md border-surface-solid-2 outline-1 hover:surface-1 transition-colors cursor-pointer">
-                More info
+            <Popover.Trigger className="flex flex-row gap-1 items-center p-1 rounded-md border-surface-solid-2 outline-1 hover:surface-1 transition-colors cursor-pointer">
+                <p>More info</p>
+                <motion.div
+                    layout
+                    animate={{
+                        rotate: open ? 180 : 0
+                    }}
+                    transition={{
+                        type: "spring",
+                        visualDuration: 0.3,
+                        bounce: 0.4
+                    }}
+                >
+                    <NavArrowDown />
+                </motion.div>
             </Popover.Trigger>
             <AnimatePresence>
                 {open && (
