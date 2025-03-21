@@ -1,3 +1,4 @@
+import Canvas from "@/components/Canvas";
 import PopoverDemo from "@/components/PopoverDemo";
 
 export default function Page() {
@@ -7,6 +8,7 @@ export default function Page() {
             <h1 className="text-3xl font-bold underline">
                 Hello world!
             </h1>
+            <Canvas />
         </div>
     );
 }

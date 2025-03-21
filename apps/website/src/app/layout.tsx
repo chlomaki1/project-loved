@@ -1,7 +1,7 @@
 import "../styles/index.css";
 
 import { IconoirProvider } from "iconoir-react";
-import { Navbar } from "@loved/ui";
+import LovedNavbar from "@/components/LovedNavbar";
 import { Torus } from "@/fonts/torus";
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
                             height: "1em"
                         }}
                     >
-                        <Navbar />
+                        <LovedNavbar />
                         {children}
                     </IconoirProvider>
                 </div>

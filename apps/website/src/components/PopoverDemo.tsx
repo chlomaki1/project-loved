@@ -43,7 +43,7 @@ export default function PopoverDemo() {
                                     show: { opacity: 1, y: 0 }
                                 }}
                             >
-                                Some more info...
+                                <p>Some more info...</p>
                             </motion.div>
                         </Popover.Content>
                     </Popover.Portal>

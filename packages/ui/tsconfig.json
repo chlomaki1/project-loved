@@ -2,6 +2,7 @@
     "extends": "@loved/typescript-config/react.json",
     "compilerOptions": {
         "outDir": "dist",
+        "allowSyntheticDefaultImports": true
     },
     "include": [
         "src"
