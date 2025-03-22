@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./item.module.css";
-import { useContext, useEffect, useMemo, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Navbar } from ".";
 
 interface ItemProps {
@@ -13,9 +13,10 @@ export function Item({ children, href }: ItemProps) {
     const elementRef = useRef<HTMLAnchorElement>(null);
     const context = useContext(Navbar.Context);
     const sectionContext = useContext(Navbar.Section.Context);
-    const isCurrent = useMemo(() => context?.currentURI == href, [context, href]);
+    const [isCurrent, setIsCurrent] = useState(false);
 
     useEffect(() => {
+        setIsCurrent(context?.currentURI == href);
         if (isCurrent && sectionContext !== null) {
             sectionContext.currentElement = elementRef.current;
         }

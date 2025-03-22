@@ -108,7 +108,7 @@ export function Section(props: SectionProps) {
         <div className="relative flex flex-row gap-1 items-center h-full">
             <canvas ref={canvasRef} className="absolute -top-2 -left-2 h-20 w-[calc(100%+--spacing(6))] pointer-events-none" />
 
-            {props.preText && <p ref={preTextRef} className="text-xl mr-4 tracking-[15%] glow max-lg:hidden">{props.preText}</p>}
+            {props.preText && <p ref={preTextRef} className="text-xl mr-4 tracking-[5px] glow max-lg:hidden">{props.preText}</p>}
             <div className="flex flex-row items-end gap-6 pl-2">
                 <div ref={iconRef} className={`h-max w-max ${props.iconGlow ? "glow" : "opacity-50"}`}>
                     {props.icon}

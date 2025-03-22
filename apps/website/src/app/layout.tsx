@@ -10,7 +10,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${Torus.className}`}>
-                <div id="app">
+                <div id="app" className="relative z-[1]">
                     <IconoirProvider
                         iconProps={{
                             strokeWidth: 2,

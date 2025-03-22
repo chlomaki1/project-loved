@@ -31,7 +31,7 @@ export default function PopoverDemo() {
                     <Popover.Portal forceMount>
                         <Popover.Content
                             asChild
-                            className="rounded-md m-1 p-5 w-64 surface-solid-1 shadow-sm"
+                            className="rounded-md m-1 p-5 w-64 surface-solid-1 shadow-sm z-10"
                             collisionPadding={{ bottom: 5, top: 5, left: 5, right: 5 }}
                         >
                             <motion.div
