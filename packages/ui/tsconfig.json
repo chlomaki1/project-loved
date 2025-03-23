@@ -1,9 +1,15 @@
 {
     "extends": "@loved/typescript-config/react.json",
     "compilerOptions": {
-      "outDir": "dist"
+        "outDir": "dist",
+        "allowSyntheticDefaultImports": true
     },
-    "include": ["src"],
-    "exclude": ["node_modules", "dist"]
-  }
-  
+    "include": [
+        "src",
+        "declaration.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
