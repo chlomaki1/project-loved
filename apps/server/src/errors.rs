@@ -42,6 +42,11 @@ pub enum LovedError {
     /// the application could not understand.
     #[error(StatusCode::BAD_REQUEST, "ERR_BAD_REQUEST", "The application was unable to understand this request.")]
     BadRequest,
+
+    /// `401 UNAUTHORIZED`
+    /// An error that occurs because the client sent an invalid session token.
+    #[error(StatusCode::UNAUTHORIZED, "ERR_UNAUTHORIZED", "The provided authorization key and/or session token is invalid.")]
+    Unauthorized,
     
     /// `404 NOT FOUND`
     /// The client tried to request an endpoint that doesn't exist.

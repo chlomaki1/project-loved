@@ -1,6 +1,5 @@
-use athena_macros::generate_display;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DbErr, EntityTrait, QueryFilter, TryIntoModel};
-use crate::{entities::{self, role_assignments, roles, users}, errors::AthenaError};
+use crate::{entities::{self, role_assignments, roles, sessions, users}, errors::AthenaError};
 use super::roles::{FullRole};
 
 pub struct FullUser {
@@ -41,6 +40,30 @@ impl FullUser {
 
     pub fn from(model: users::Model, roles: Vec<FullRole>) -> Self {
         FullUser { base: model.clone(), roles }
+    }
+
+    pub async fn from_session(token: &str, conn: &sea_orm::DatabaseConnection) -> Result<Self, AthenaError> {
+        let session = sessions::Entity::find()
+            .filter(sessions::Column::SessionToken.eq(token))
+            .one(conn)
+            .await?;
+
+        if let Some(session) = session {
+            let user = users::Entity::find_by_id(session.user_id)
+                .one(conn)
+                .await?;
+
+            if let Some(user) = user {
+                Ok(FullUser {
+                    base: user.clone(),
+                    roles: get_user_roles(user.id, conn).await.unwrap_or(Vec::new())
+                })
+            } else {
+                Err(AthenaError::ModelNotFound("user"))
+            }
+        } else {
+            Err(AthenaError::ModelNotFound("session"))
+        }
     }
 
     pub fn into_display(self) -> serde_json::Value {
