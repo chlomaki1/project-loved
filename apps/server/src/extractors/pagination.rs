@@ -70,13 +70,7 @@ impl<const HARD_LIMIT: usize, Output> Pagination<HARD_LIMIT, Output>
     pub async fn provide<Fut>(mut self, fun: impl FnOnce(&Pagination<HARD_LIMIT, Output>) -> Fut) -> Result<Self, LovedError>
         where Fut: Future<Output = Result<Vec<Output>, LovedError>>
     {
-        let data = fun(&self).await;
-
-        if let Err(e) = data {
-            return Err(e);
-        }
-
-        self.data = data.unwrap();
+        self.data = fun(&self).await?;
         Ok(self)
     }
 
