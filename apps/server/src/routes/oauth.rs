@@ -1,8 +1,9 @@
 use actix_web::{get, web, Responder};
-use athena::{entities::users, prelude::users::FullUser};
+use athena::{entities::{sessions, users}, prelude::users::FullUser};
 use redis::Commands;
 use sea_orm::{ActiveModelTrait, IntoActiveModel};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 use crate::{errors::LovedError, service::{self, Response}, state::LovedState};
 
@@ -136,13 +137,25 @@ pub async fn login_token_callback(
                 }, &state.db_pool).await?.into_display());
             }
 
-            if let Some(mut display_user) = display_user {
-                display_user.obtain_roles(&state.db_pool).await?;
+            if let Some(display_user) = display_user {
+                let token = service::generate_token();
+                let session = sessions::ActiveModel {
+                    id: sea_orm::ActiveValue::NotSet,
+                    user_id: sea_orm::ActiveValue::Set(user.user_id.try_into().unwrap()),
+                    session_token: sea_orm::ActiveValue::Set(token.clone()),
+                    expires_at: sea_orm::ActiveValue::Set(chrono::Utc::now().naive_utc() + chrono::Duration::days(30)),
+                };
+
+                session.insert(&state.db_pool)
+                    .await?;
 
                 Ok(Response {
                     status: 200,
                     message: None,
-                    data: Some(display_user)
+                    data: Some(json!({
+                        "token": token,
+                        "user": display_user
+                    }))
                 })
             } else {
                 // This shouldn't be possible.

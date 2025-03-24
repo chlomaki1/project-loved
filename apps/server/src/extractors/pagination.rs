@@ -3,10 +3,11 @@ use std::future::Future;
 use actix_web::{FromRequest, HttpRequest, Responder};
 use futures_util::future::LocalBoxFuture;
 use serde::Serialize;
+use serde_json::Value;
 
 use crate::{errors::LovedError, service::Response};
 
-pub struct Pagination<Output, const HARD_LIMIT: usize> 
+pub struct Pagination<const HARD_LIMIT: usize, Output = Value> 
     where Output: Serialize
 {
     pub page: u32,
@@ -15,11 +16,11 @@ pub struct Pagination<Output, const HARD_LIMIT: usize>
     pub data: Vec<Output>,
 }
 
-impl<Output, const HARD_LIMIT: usize> FromRequest for Pagination<Output, HARD_LIMIT>
+impl<const HARD_LIMIT: usize, Output> FromRequest for Pagination<HARD_LIMIT, Output>
     where Output: Serialize
 {
     type Error = LovedError;
-    type Future = LocalBoxFuture<'static, Result<Pagination<Output, HARD_LIMIT>, LovedError>>;
+    type Future = LocalBoxFuture<'static, Result<Pagination<HARD_LIMIT, Output>, LovedError>>;
 
     fn from_request(
         req: &HttpRequest,
@@ -59,14 +60,14 @@ impl<Output, const HARD_LIMIT: usize> FromRequest for Pagination<Output, HARD_LI
     }
 }
 
-impl<Output, const HARD_LIMIT: usize> Pagination<Output, HARD_LIMIT>
+impl<const HARD_LIMIT: usize, Output> Pagination<HARD_LIMIT, Output> 
     where Output: Serialize
 {
     pub fn get_page_offset(&self) -> u32 {
         (self.page - 1) * self.limit as u32
     }
 
-    pub async fn provide<Fut>(mut self, fun: impl FnOnce(&Pagination<Output, HARD_LIMIT>) -> Fut) -> Result<Self, LovedError>
+    pub async fn provide<Fut>(mut self, fun: impl FnOnce(&Pagination<HARD_LIMIT, Output>) -> Fut) -> Result<Self, LovedError>
         where Fut: Future<Output = Result<Vec<Output>, LovedError>>
     {
         let data = fun(&self).await;

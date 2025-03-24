@@ -3,13 +3,6 @@ use athena_macros::generate_display;
 use sea_orm::{ActiveModelTrait, DbErr, EntityTrait};
 use crate::{entities::roles, errors::AthenaError};
 
-generate_display! {
-    #[display(roles::Model)]
-    DisplayRole {
-        id = i32: base.id
-    }
-}
-
 pub struct FullRole {
     pub base: roles::Model,
     pub permissions: Permissions
@@ -53,11 +46,11 @@ impl FullRole {
         })
     }
 
-    pub fn into_display(self) -> DisplayRole {
-        DisplayRole {
-            base: self.base.clone(),
-            id: self.base.id
-        }
+    pub fn into_display(self) -> serde_json::Value {
+        serde_json::json!({
+            "id": self.base.id,
+            "permissions": self.permissions.bits()
+        })
     }
 }
 

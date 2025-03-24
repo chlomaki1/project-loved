@@ -1,16 +1,7 @@
 use athena_macros::generate_display;
 use sea_orm::{ActiveModelTrait, DbErr, EntityTrait, Select};
 use crate::{entities::submissions, errors::AthenaError};
-use super::{users::{DisplayUser, FullUser}, AsyncFromDatabase};
-
-generate_display! {
-    #[display(submissions::Model)]
-    DisplaySubmission {
-        id = i32: base.id,
-        submitter = DisplayUser: DisplayUser::default()
-    } 
-}
-
+use super::{users::{FullUser}, AsyncFromDatabase};
 
 pub struct FullSubmission {
     pub base: submissions::Model,
@@ -53,14 +44,6 @@ impl FullSubmission {
         }
     
         Ok(full_submissions)
-    }
-
-    pub fn into_display(self) -> DisplaySubmission {
-        DisplaySubmission { 
-            base: self.base.clone(), 
-            id: self.base.id,
-            submitter: self.submitter.into_display()
-        }
     }
 }
 

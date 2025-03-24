@@ -47,9 +47,8 @@ impl PrimaryKeyTrait for PrimaryKey {
 pub enum Relation {
     Beatmaps,
     Beatmapsets,
+    Ratings,
     RoleAssignments,
-    SubmissionRatings,
-    SubmissionReviewRatings,
     SubmissionReviews,
 }
 
@@ -72,11 +71,8 @@ impl RelationTrait for Relation {
         match self {
             Self::Beatmaps => Entity::has_many(super::beatmaps::Entity).into(),
             Self::Beatmapsets => Entity::has_many(super::beatmapsets::Entity).into(),
+            Self::Ratings => Entity::has_many(super::ratings::Entity).into(),
             Self::RoleAssignments => Entity::has_many(super::role_assignments::Entity).into(),
-            Self::SubmissionRatings => Entity::has_many(super::submission_ratings::Entity).into(),
-            Self::SubmissionReviewRatings => {
-                Entity::has_many(super::submission_review_ratings::Entity).into()
-            }
             Self::SubmissionReviews => Entity::has_many(super::submission_reviews::Entity).into(),
         }
     }
@@ -94,21 +90,15 @@ impl Related<super::beatmapsets::Entity> for Entity {
     }
 }
 
+impl Related<super::ratings::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Ratings.def()
+    }
+}
+
 impl Related<super::role_assignments::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::RoleAssignments.def()
-    }
-}
-
-impl Related<super::submission_ratings::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::SubmissionRatings.def()
-    }
-}
-
-impl Related<super::submission_review_ratings::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::SubmissionReviewRatings.def()
     }
 }
 

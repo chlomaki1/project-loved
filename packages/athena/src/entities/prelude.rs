@@ -2,10 +2,10 @@
 
 pub use super::beatmaps::Entity as Beatmaps;
 pub use super::beatmapsets::Entity as Beatmapsets;
+pub use super::ratings::Entity as Ratings;
 pub use super::role_assignments::Entity as RoleAssignments;
 pub use super::roles::Entity as Roles;
-pub use super::submission_ratings::Entity as SubmissionRatings;
-pub use super::submission_review_ratings::Entity as SubmissionReviewRatings;
+pub use super::sessions::Entity as Sessions;
 pub use super::submission_reviews::Entity as SubmissionReviews;
 pub use super::submissions::Entity as Submissions;
 pub use super::users::Entity as Users;

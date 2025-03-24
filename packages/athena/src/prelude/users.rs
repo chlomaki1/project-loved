@@ -1,33 +1,7 @@
 use athena_macros::generate_display;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DbErr, EntityTrait, QueryFilter, TryIntoModel};
 use crate::{entities::{self, role_assignments, roles, users}, errors::AthenaError};
-use super::roles::{DisplayRole, FullRole};
-
-generate_display! {
-    #[display(users::Model)]
-    DisplayUser {
-        roles = Vec<DisplayRole>: Vec::new()
-    }
-
-    pub fn default() -> Self {
-        DisplayUser {
-            base: <users::ActiveModel as ActiveModelTrait>::default()
-                .try_into_model()
-                .unwrap(),
-            roles: Vec::new()
-        }
-    }
-}
-
-impl DisplayUser {
-    pub async fn obtain_roles(&mut self, conn: &sea_orm::DatabaseConnection) -> Result<(), DbErr> {
-        if let Ok(roles) = get_user_roles(self.base.id, conn).await {
-            self.roles = roles.into_iter().map(|r| r.into_display()).collect();
-        }
-
-        Ok(())
-    }
-}
+use super::roles::{FullRole};
 
 pub struct FullUser {
     pub base: users::Model,
@@ -69,8 +43,14 @@ impl FullUser {
         FullUser { base: model.clone(), roles }
     }
 
-    pub fn into_display(self) -> DisplayUser {
-        DisplayUser { base: self.base, roles: self.roles.into_iter().map(|r| r.into_display()).collect() }
+    pub fn into_display(self) -> serde_json::Value {
+        serde_json::json!({
+            "id": self.base.id,
+            "username": self.base.username,
+            "country": self.base.country,
+            "restricted": self.base.restricted,
+            "roles": self.roles.into_iter().map(|r| r.into_display()).collect::<Vec<_>>()
+        })
     }
 }
 

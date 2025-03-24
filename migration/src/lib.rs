@@ -7,10 +7,12 @@ impl MigratorTrait for Migrator {
     fn migrations() -> Vec<Box<dyn MigrationTrait>> {
         vec![
             Box::new(m20250227_185441_create_initial_schema::Migration),
-            Box::new(m20250309_083034_submissions::Migration)
+            Box::new(m20250309_083034_submissions::Migration),
+            Box::new(m20250320_153743_sessions::Migration),
         ]
     }
 }
 
 mod m20250227_185441_create_initial_schema;
 mod m20250309_083034_submissions;
+mod m20250320_153743_sessions;
